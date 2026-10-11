@@ -22,7 +22,10 @@ Clauses:
    component of `L_l[W]` (or a new isolated vertex) to a vertex `z`, and adding at most one bridge
    from `z` into each component of `L_l[Q]` that `z` does not reach, must not make `z` adjacent to
    all of `Q` in `H₀ ∪ H₁` (otherwise `K₉` would be biplanar). Clauses are emitted for covers that
-   use at most two bridges.
+   use at most two bridges;
+6. consequences of the planarity of each layer: no 5-clique and no `K₃,₃` of the graph lies inside
+   one layer, and at most `3s - 6` edges of an `s`-clique (`s = 6, 7, 8`) lie inside one layer
+   (a sequential counter with fresh variables).
 -/
 
 namespace Biplanar
@@ -117,6 +120,25 @@ def reach (I : Inst) (l : Nat) (S : Array Nat) : M (Array (Array Lit)) := do
     R := R2
   return R
 
+/-- The `k`-element sublists of `l`, in lexicographic order. -/
+def choose : Nat → List Nat → List (List Nat)
+  | 0, _ => [[]]
+  | _ + 1, [] => []
+  | k + 1, x :: xs => (choose k xs).map (x :: ·) ++ choose (k + 1) xs
+
+/-- At most `k` of the literals `xs` are true (sequential counter with fresh variables). -/
+def atMost (xs : List Lit) (k : Nat) : M Unit := do
+  let mut prev : Array Lit := #[]
+  for x in xs do
+    let mut cur : Array Lit := #[]
+    for _ in [0:k] do cur := cur.push (pos (← fresh))
+    emit [x.neg, cur[0]!]
+    if prev.size == k then
+      for j in [0:k] do emit [prev[j]!.neg, cur[j]!]
+      for j in [1:k] do emit [x.neg, prev[j-1]!.neg, cur[j]!]
+      emit [x.neg, prev[k-1]!.neg]
+    prev := cur
+
 def encode (w : List Nat) : CNF Nat := Id.run do
   let I := mkInst w
   let n := I.n
@@ -148,6 +170,26 @@ def encode (w : List Nat) : CNF Nat := Id.run do
     for P in I.parts do
       for j in [0:P.size - 1] do emit [lt I 0 0 P[j]! P[j+1]!]
     emit [tru I]
+    -- 6. consequences of the planarity of each layer: no K₅ and no K₃,₃ of the graph inside one
+    --    layer, and at most 3s - 6 edges of an s-clique (s = 6, 7, 8) inside one layer
+    let V := List.range n
+    let isClique (S : List Nat) : Bool := S.all fun a => S.all fun b => a == b || I.adj a b
+    let pairsOf (S : List Nat) : List (Nat × Nat) := (choose 2 S).filterMap fun
+      | [a, b] => some (a, b)
+      | _ => none
+    for S in choose 5 V do
+      if isClique S then
+        for l in [0:2] do emit ((pairsOf S).map fun (a, b) => (lay I l a b).neg)
+    for A in choose 3 V do
+      let rest := V.filter fun v => !(A.contains v) && A.all fun a => I.adj v a
+      for B in choose 3 rest do
+        if A.head! < B.head! then
+          for l in [0:2] do
+            emit (A.flatMap fun a => B.map fun b => (lay I l a b).neg)
+    for sz in [6, 7, 8] do
+      for S in choose sz V do
+        if isClique S then
+          for l in [0:2] do atMost ((pairsOf S).map fun (a, b) => lay I l a b) (3 * sz - 6)
     -- 5. K₉ certificates
     for i in [0:I.k] do
       let Q := I.parts[i]! ++ I.parts[(i + 1) % I.k]!

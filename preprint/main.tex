@@ -171,7 +171,8 @@ Fix $w$ with $n=n(w)$, number the vertices $0,\dots,n-1$ bag by bag, and let $E$
 \item $\ell^1_e\vee\ell^2_e$ for every $e\in E$;
 \item for every $e=uv\in E$, every $j$ and every $x\notin\{u,v\}$: $\ell^j_e\Rightarrow\bigvee_{i}\bigl(o^{j,i}_{ux}\wedge o^{j,i}_{vx}\bigr)$;
 \item for any two vertices $a<b$ that are consecutive in the numbering of the same bag, $a<_{1,1}b$;
-\item the clauses of Lemma~\ref{lem:contract} described below, for every pair of consecutive bags $Q=A_i\cup A_{i+1}$ with $|Q|=8$.
+\item the clauses of Lemma~\ref{lem:contract} described below, for every pair of consecutive bags $Q=A_i\cup A_{i+1}$ with $|Q|=8$;
+\item for every $j$ and every subgraph $S$ of $\cw$ isomorphic to $K_5$ or $K_{3,3}$, the clause $\bigvee_{e\in E(S)}\neg\ell^j_e$; and for every $j$ and every clique $S$ of $\cw$ with $s\in\{6,7,8\}$ vertices, the constraint that at most $3s-6$ of the variables $\ell^j_e$ with $e\subseteq S$ are true, written with the sequential counter of~\cite{Si}.
 \end{enumerate}
 
 For (E5) fix such a $Q$ and $W=V\setminus Q$. Connectivity inside a set $S$ is expressed by the variables
@@ -195,7 +196,7 @@ If $\cw$ is biplanar, then $\Phi(w)$ is satisfiable.
 \end{proposition}
 
 \begin{proof}
-Let $L_1,L_2$ be planar layers of $\cw$. Every permutation of a bag is an automorphism of $\cw$, so after renaming the vertices inside each bag we may assume that the orders of Theorem~\ref{thm:schnyder} for $L_1$ list each bag in increasing order in $<_{1,1}$; renaming carries layers to layers and orders to orders. Set $\ell^j_e$ true exactly when $e\in E(L_j)$, the variables $o$ from the six orders, and every auxiliary variable to the value of its definition. Then (E1), (E2) and (E4) hold, and (E3) holds by Theorem~\ref{thm:schnyder}.
+Let $L_1,L_2$ be planar layers of $\cw$. Every permutation of a bag is an automorphism of $\cw$, so after renaming the vertices inside each bag we may assume that the orders of Theorem~\ref{thm:schnyder} for $L_1$ list each bag in increasing order in $<_{1,1}$; renaming carries layers to layers and orders to orders. Set $\ell^j_e$ true exactly when $e\in E(L_j)$, the variables $o$ from the six orders, and every auxiliary variable to the value of its definition. Then (E1), (E2) and (E4) hold, and (E3) holds by Theorem~\ref{thm:schnyder}. A planar graph contains neither $K_5$ nor $K_{3,3}$~\cite{Ku}, and a planar graph on $s\ge3$ vertices has at most $3s-6$ edges, so the edges of $L_j$ inside a clique of $s$ vertices number at most $3s-6$; with the counter variables set to their intended values, (E6) holds.
 
 By induction on $t$, $r^{j,S,t}_{xy}$ is true exactly when $L_j[S]$ has an $x$--$y$ walk of length at most $t$, so $R^{j,S}_{xy}$ is reachability in $L_j[S]$, and $\lit{att}$ and $\lit{free}$ have the meaning stated above. Given $x_1,x_2$, let $C_j$ be the component of $x_j$ in $L_j[W]$, or $\emptyset$ if $x_j=\ast$. Then $c_q$ is true exactly when $q\in N_1(C_1)\cup N_2(C_2)$. A violated clause of (E5) would give sets $F_1,F_2$ with at most two elements in total, each element in a component of $L_j[Q]$ disjoint from $N_j(C_j)$ and two elements of $F_j$ in different components, such that $N_1(C_1)\cup F_1\cup N_2(C_2)\cup F_2=Q$. Lemma~\ref{lem:contract} rules this out.
 \end{proof}
@@ -216,7 +217,7 @@ The formulas are produced by a Lean~4 function from $w$, and the clause counts i
 \caption{The $26$ weight vectors with $n(w)=17$ and $s(w)\le8$, up to the dihedral action, with the size of $\Phi(w)$, the solving time of CaDiCaL, the size of the trimmed LRAT proof and the time of the Lean check.}\label{tab:certs}
 \end{table}
 
-The argument rests on the following, which are not formalised: Theorem~\ref{thm:schnyder}; the facts that minors of planar graphs are planar and that joining two components of a planar graph by an edge keeps it planar; the non-biplanarity of $K_9$~\cite{BHK,Tu}; and Proposition~\ref{prop:sound}, whose proof is above. The Lean checks of the certificates evaluate the verified checker by compiled code, so they also trust the Lean compiler. Proposition~\ref{prop:sixteen}, Lemma~\ref{lem:lists}, the enumeration behind Lemma~\ref{lem:reduce} and $8$-colourings of the $36$ graphs of Table~\ref{tab:sixteen} are checked in Lean by kernel evaluation.\footnote{The colourings give a second proof of the bound $\chi\le8$ in Corollary~\ref{cor:chi} that does not use~\eqref{eq:chi}: a biplanar $\cw$ is a subgraph of one of the $36$ graphs.}
+The argument rests on the following, which are not formalised: Theorem~\ref{thm:schnyder}; the non-planarity of $K_5$ and $K_{3,3}$ and the bound $3s-6$ for planar graphs on $s\ge3$ vertices; the facts that minors of planar graphs are planar and that joining two components of a planar graph by an edge keeps it planar; the non-biplanarity of $K_9$~\cite{BHK,Tu}; and Proposition~\ref{prop:sound}, whose proof is above. The Lean checks of the certificates evaluate the verified checker by compiled code, so they also trust the Lean compiler. Proposition~\ref{prop:sixteen}, Lemma~\ref{lem:lists}, the enumeration behind Lemma~\ref{lem:reduce} and $8$-colourings of the $36$ graphs of Table~\ref{tab:sixteen} are checked in Lean by kernel evaluation.\footnote{The colourings give a second proof of the bound $\chi\le8$ in Corollary~\ref{cor:chi} that does not use~\eqref{eq:chi}: a biplanar $\cw$ is a subgraph of one of the $36$ graphs.}
 
 \section{Proof of Theorem~\ref{thm:main}}\label{sec:proof}
 
@@ -270,11 +271,17 @@ M.~Kirchweger, M.~Scheucher and S.~Szeider, \emph{SAT-based generation of planar
 \bibitem{Le}
 L.~de Moura and S.~Ullrich, \emph{The Lean~4 theorem prover and programming language}, in: Automated Deduction (CADE 28), Lecture Notes in Comput. Sci. \textbf{12699}, Springer, 2021, 625--635. \doi{10.1007/978-3-030-79876-5_37}
 
+\bibitem{Ku}
+K.~Kuratowski, \emph{Sur le probl\`eme des courbes gauches en topologie}, Fund. Math. \textbf{15} (1930), 271--283. \doi{10.4064/fm-15-1-271-283}
+
 \bibitem{Ri}
 G.~Ringel, \emph{F\"arbungsprobleme auf Fl\"achen und Graphen}, VEB Deutscher Verlag der Wissenschaften, Berlin, 1959.
 
 \bibitem{Sc}
 W.~Schnyder, \emph{Planar graphs and poset dimension}, Order \textbf{5} (1989), 323--343. \doi{10.1007/BF00353652}
+
+\bibitem{Si}
+C.~Sinz, \emph{Towards an optimal CNF encoding of Boolean cardinality constraints}, in: Principles and Practice of Constraint Programming (CP 2005), Lecture Notes in Comput. Sci. \textbf{3709}, Springer, 2005, 827--831. \doi{10.1007/11564751_73}
 
 \bibitem{Sz}
 S.~Szeider, \emph{Biplanar graphs with independence number two are $9$-colorable}, arXiv:2609.28102, 2026. \doi{10.48550/arXiv.2609.28102}

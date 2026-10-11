@@ -28,7 +28,7 @@ jobs:
   certificates:
     name: Certificate ${{ matrix.w }}
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 355
     strategy:
       fail-fast: false
       matrix:

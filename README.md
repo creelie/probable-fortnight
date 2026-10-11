@@ -28,8 +28,9 @@ check, dated 11 October 2026, that the question was still open.
    enough of `Q`, contracting it gives a ninth vertex joined to all of `Q`, and the two layers then
    contain `K_9`, which is not biplanar (Battle–Harary–Kodama 1962, Tutte 1963).
 4. **Encoding and certificates** (Sections 4 and 5). Schnyder's order characterisation of planarity
-   plus the clauses of the contraction lemma give a formula `Φ(w)` that is satisfiable whenever
-   `C5[w]` is biplanar. CaDiCaL 3.0.1 refutes `Φ(w)` for all 26 vectors, lrat-trim shortens the LRAT
+   plus the clauses of the contraction lemma and clauses implied by planarity of each layer (no
+   `K_5` or `K_{3,3}` inside a layer, at most `3s-6` edges of an `s`-clique inside a layer) give a
+   formula `Φ(w)` that is satisfiable whenever `C5[w]` is biplanar. CaDiCaL 3.0.1 refutes `Φ(w)` for all 26 vectors, lrat-trim shortens the LRAT
    proofs, and Lean 4 checks each proof against the formula produced by the Lean encoder.
 
 ## What is checked, and how
@@ -48,7 +49,8 @@ only `propext`, `Classical.choice` and `Quot.sound`. Each certificate theorem ad
 one axiom that `native_decide` introduces, which trusts the Lean compiler; `certify.sh` rejects any
 other axiom.
 
-Not formalised, and stated as such in the paper: Schnyder's theorem; that minors of planar graphs
+Not formalised, and stated as such in the paper: Schnyder's theorem; that `K_5` and `K_{3,3}` are
+not planar and a planar graph on `s >= 3` vertices has at most `3s-6` edges; that minors of planar graphs
 are planar and that joining two components of a planar graph by an edge keeps it planar; the
 non-biplanarity of `K_9`; and the soundness of the encoding (Proposition 4.2, proved in the paper).
 
