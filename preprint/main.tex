@@ -223,7 +223,7 @@ The argument rests on the following, which are not formalised: Theorem~\ref{thm:
 Let $w\in\Z_{\ge1}^5$. If $s(w)\ge9$ then $\cw$ contains $K_9$ and is not biplanar. Suppose $s(w)\le8$. If $n(w)\ge17$, Lemma~\ref{lem:reduce}(a) gives $v\le w$ with $n(v)=17$ and $s(v)\le8$; up to symmetry $v$ is in Table~\ref{tab:certs}, so $C_5[v]$ is not biplanar by Theorem~\ref{thm:unsat}, and neither is its supergraph $\cw$. If $n(w)\le16$, Lemma~\ref{lem:reduce}(b) gives $v\ge w$ in Table~\ref{tab:sixteen} up to symmetry, and $\cw$ is a subgraph of the biplanar graph $C_5[v]$ of Proposition~\ref{prop:sixteen}. \qed
 
 \begin{remark}
-The graph $C_5[4,4,4,4,3]$ of~\cite{KSS} contains $C_5[3,3,3,4,4]$, one of the graphs of Table~\ref{tab:certs}. Without the clauses (E5) the formulas of Table~\ref{tab:certs} were not refuted in hours of solving, while with them the slowest takes %SLOWEST%. The contraction clauses are useful whenever a graph has many $8$-cliques whose complements are small.
+The graph $C_5[4,4,4,4,3]$ of~\cite{KSS} contains $C_5[3,3,3,4,4]$, one of the graphs of Table~\ref{tab:certs}. The clauses (E5) are what make the computation feasible: without them CaDiCaL did not refute the formula for $w=(1,1,7,1,7)$, the easiest of the $26$, within thirty minutes, while with them it is refuted in under a minute and the slowest of the $26$ takes %SLOWEST%. The contraction clauses are useful whenever a graph has many $8$-cliques whose complements are small.
 \end{remark}
 
 \subsection*{Data availability}

@@ -25,19 +25,25 @@ cd "$LEAN"
 lake build biplanar-dump > /dev/null
 lake exe biplanar-dump "$W" "$B/cnf/$TAG.cnf"
 
+now() { date +%s.%N; }
+since() { awk -v a="$1" -v b="$(now)" 'BEGIN { printf "%.1f", b - a }'; }
+T_SOLVE=-; T_TRIM=-
 if [ -f "$ROOT/dist/certificates/$TAG.lrat.xz" ]; then
   xz -dc "$ROOT/dist/certificates/$TAG.lrat.xz" > "$B/lrat/$TAG.lrat"
 else
+  t0=$(now)
   set +e
   "$CADICAL" -q --lrat=true --binary=true "$B/cnf/$TAG.cnf" "$B/lrat/$TAG.raw" > "$B/log/$TAG.cadical.txt"
   rc=$?
   set -e
   [ "$rc" = 20 ] || { echo "CaDiCaL exit code $rc on $W (expected 20 = unsatisfiable)"; exit 1; }
+  T_SOLVE=$(since "$t0"); t0=$(now)
   set +e
   "$LRAT_TRIM" -q -a "$B/cnf/$TAG.cnf" "$B/lrat/$TAG.raw" "$B/lrat/$TAG.lrat"
   rc=$?
   set -e
   [ "$rc" = 20 ] || { echo "lrat-trim exit code $rc on $W (expected 20 = proof verified)"; exit 1; }
+  T_TRIM=$(since "$t0")
   rm -f "$B/lrat/$TAG.raw"
 fi
 
@@ -54,7 +60,9 @@ theorem Biplanar.unsat_$TAG : (Biplanar.encode [${W//,/, }]).Unsat :=
 
 #print axioms Biplanar.unsat_$TAG
 LEANEOF
+t0=$(now)
 lake env lean "Certs/Unsat_$TAG.lean" 2>&1 | tee "$B/log/$TAG.lean.txt"
+T_LEAN=$(since "$t0")
 if grep -q "error" "$B/log/$TAG.lean.txt"; then echo "Lean rejected the certificate for $W"; exit 1; fi
 AX=$(tr '\n' ' ' < "$B/log/$TAG.lean.txt" | sed -n "s/.*'Biplanar.unsat_$TAG' depends on axioms: \[\([^]]*\)\].*/\1/p")
 for a in $(echo "$AX" | tr ',' ' '); do
@@ -65,4 +73,4 @@ for a in $(echo "$AX" | tr ',' ' '); do
 done
 [ -n "$AX" ] || { echo "no axiom report"; exit 1; }
 sha256sum "$B/lrat/$TAG.lrat" | sed "s|$B/lrat/||" >> "$B/log/certificates.sha256"
-echo "certify.sh: $W refuted and checked in Lean"
+echo "certify.sh: $W refuted and checked in Lean ($(head -n 1 "$B/cnf/$TAG.cnf" | cut -d' ' -f3,4 | sed 's/ / variables, /') clauses; solve ${T_SOLVE} s, trim ${T_TRIM} s, Lean ${T_LEAN} s; proof $(stat -c %s "$B/lrat/$TAG.lrat") bytes)"
