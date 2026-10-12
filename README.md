@@ -12,6 +12,13 @@ consecutive on the five-cycle. Then `C5[w]` is biplanar if and only if
 Question 7.3 of A. Trivedi, *Biplanar clique blow-ups of C5 are 9-colourable*
 ([doi:10.5281/zenodo.22074335](https://doi.org/10.5281/zenodo.22074335)) in the negative.
 
+> **Status, 12 October 2026: the proof is not yet complete.** The refutations of Theorem 5.1 are
+> certified for 18 of the 26 seventeen-vertex vectors. For the other eight, `(2,2,5,3,5)`,
+> `(2,3,4,3,5)`, `(2,3,4,4,4)`, `(2,3,5,3,4)`, `(2,4,3,3,5)`, `(2,4,3,4,4)`, `(3,3,3,4,4)` and
+> `(3,3,4,3,4)`, the decision-tree certification is still running (cubes in
+> [`verification/data/cubes/`](verification/data/cubes/)). Until all eight are certified, the theorem
+> and the answer to Question 7.3 are not proved, and no release is made.
+
 The paper is in [`preprint/`](preprint/main.tex); the built PDF, the LaTeX source with PNG figures
 and the arXiv tarball are attached to each release. [PRIORITY-CHECK.md](PRIORITY-CHECK.md) records the
 check, dated 11 October 2026, that the question was still open.
@@ -30,7 +37,7 @@ check, dated 11 October 2026, that the question was still open.
 4. **Encoding and certificates** (Sections 4 and 5). Schnyder's order characterisation of planarity
    plus the clauses of the contraction lemma and clauses implied by planarity of each layer (no
    `K_5` or `K_{3,3}` inside a layer, at most `3s-6` edges of an `s`-clique inside a layer) give a
-   formula `Φ(w)` that is satisfiable whenever `C5[w]` is biplanar. CaDiCaL 3.0.1 refutes `Φ(w)` for all 26 vectors, lrat-trim shortens the LRAT
+   formula `Φ(w)` that is satisfiable whenever `C5[w]` is biplanar. CaDiCaL 3.0.1 is to refute `Φ(w)` for all 26 vectors (18 done so far, see the status above), lrat-trim shortens the LRAT
    proofs, and Lean 4 checks each proof against the formula produced by the Lean encoder.
 
 ## What is checked, and how

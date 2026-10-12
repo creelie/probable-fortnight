@@ -42,7 +42,7 @@
 \keywords{Earth--Moon problem, thickness, biplanar graph, clique blow-up, Schnyder's theorem, LRAT}
 
 \begin{abstract}
-We prove that a clique blow-up of the five-cycle is biplanar if and only if it has at most sixteen vertices and clique number at most eight. Consequently every biplanar clique blow-up of the five-cycle is $8$-colourable, which answers a question of Trivedi. The non-biplanar cases are refuted by a propositional encoding of biplanarity, strengthened by a contraction argument for $K_9$, whose unsatisfiability certificates are checked in Lean~4.
+We prove that a clique blow-up of the five-cycle is biplanar if and only if it has at most sixteen vertices and clique number at most eight. Consequently every biplanar clique blow-up of the five-cycle is $8$-colourable, which answers a question of Trivedi. The non-biplanar cases are refuted by a propositional encoding of biplanarity, strengthened by a contraction argument for $K_9$, whose unsatisfiability certificates are checked in Lean~4. \emph{Status, 12 October 2026: the certificates for eight of the twenty-six non-biplanar cases are not yet complete, so the proof is not yet complete; see Remark~\ref{rem:status}.}
 \end{abstract}
 
 \maketitle
@@ -208,6 +208,10 @@ The formula carries one clause family for each $8$-clique and each pair $x_1,x_2
 \begin{theorem}\label{thm:unsat}
 For each of the $26$ vectors $w$ of Table~\ref{tab:certs}, $\Phi(w)$ is unsatisfiable. Hence none of the graphs $\cw$ is biplanar.
 \end{theorem}
+
+\begin{remark}[Status]\label{rem:status}
+At the time of writing, certificates exist for $18$ of the $26$ vectors. For the eight vectors $(2,2,5,3,5)$, $(2,3,4,3,5)$, $(2,3,4,4,4)$, $(2,3,5,3,4)$, $(2,4,3,3,5)$, $(2,4,3,4,4)$, $(3,3,3,4,4)$ and $(3,3,4,3,4)$ the decision-tree certification described below is still in progress. Until it is complete, Theorem~\ref{thm:unsat}, and with it Theorem~\ref{thm:main}, is not proved.
+\end{remark}
 
 The formulas are produced by a Lean~4 function from $w$, and the clause counts in Table~\ref{tab:certs} are those of its output. CaDiCaL~3.0.1~\cite{CaD} refutes each formula on one core and writes a proof in the LRAT format~\cite{LRAT}, a clausal proof in which every derived clause carries the hints that justify it. The proofs were shortened with lrat-trim, which keeps only the clauses used in the final refutation, and each trimmed proof was then checked against the formula by the LRAT checker of the Lean~4 standard library~\cite{Le}, which is proved sound in Lean. The result of each check is a Lean theorem stating that the formula is unsatisfiable.
 
