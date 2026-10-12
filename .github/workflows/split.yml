@@ -1,0 +1,91 @@
+name: split
+
+# Refutes the formula Phi(w) leaf by leaf along a decision tree (scripts/certify_split.sh). Each job
+# runs three workers; worker j of job p takes the leaves i with i - 1 = 3p + j modulo 3 * jobs, and
+# Lean checks every proof. A leaf that is not refuted within the time limit is listed in
+# build/log/W_open.txt, to be split further in a later run.
+
+on:
+  workflow_dispatch:
+    inputs:
+      w:
+        description: "weight vector"
+        required: true
+        default: "3,3,4,3,4"
+      leaves:
+        description: "file with the leaves (DIMACS cubes, one per line)"
+        required: true
+        default: "verification/data/cubes/3_3_4_3_4.txt"
+      jobs:
+        description: "number of jobs"
+        required: true
+        default: "16"
+      timeout:
+        description: "seconds per leaf"
+        required: true
+        default: "1800"
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      parts: ${{ steps.p.outputs.parts }}
+    steps:
+      - id: p
+        run: echo "parts=$(seq -s, 0 $(( ${{ inputs.jobs }} - 1 )) | sed 's/^/[/; s/$/]/')" >> "$GITHUB_OUTPUT"
+  split:
+    needs: plan
+    name: Part ${{ matrix.part }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    strategy:
+      fail-fast: false
+      matrix:
+        part: ${{ fromJSON(needs.plan.outputs.parts) }}
+    env:
+      W: ${{ inputs.w }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk space for the proofs
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h /
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Build CaDiCaL 3.0.1, lrat-trim and the Lean project
+        run: |
+          scripts/get_tools.sh
+          mkdir -p build/cnf build/log
+          cd verification/lean
+          lake build > /dev/null
+          lake build biplanar-dump > /dev/null
+          lake exe biplanar-dump "$W" "../../build/cnf/${W//,/_}.cnf"
+      - name: Refute the leaves and check the proofs in Lean
+        run: |
+          N=$(( ${{ inputs.jobs }} * 3 ))
+          pids=()
+          for j in 0 1 2; do
+            NOBUILD=1 LEAF_TIMEOUT=${{ inputs.timeout }} LEAVES="$PWD/${{ inputs.leaves }}" \
+              timeout 325m scripts/certify_split.sh "$W" $(( ${{ matrix.part }} * 3 + j )) "$N" \
+              > "build/log/worker$j.txt" 2>&1 &
+            pids+=($!)
+          done
+          rc=0
+          for p in "${pids[@]}"; do wait "$p" || rc=$?; done
+          cat build/log/worker*.txt
+          ! grep -q "rejected\|unexpected axiom\|exit code" build/log/worker*.txt
+      - name: Keep the logs and the proof hashes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: split-${{ matrix.part }}
+          path: |
+            build/log/worker*.txt
+            build/log/*_open.txt
+            build/log/leaves.sha256

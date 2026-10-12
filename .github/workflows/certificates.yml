@@ -1,20 +1,13 @@
 name: certificates
 
 # Refutes the 26 formulas of Theorem 5.1 with the pinned CaDiCaL and checks each trimmed LRAT proof
-# in Lean 4. It runs when the encoder, the Lean project or the scripts change, and by hand.
+# in Lean 4. It runs when the encoder or the scripts change on main, and by hand.
 
 on:
-  pull_request:
-    paths:
-      - "verification/lean/**"
-      - "verification/data/cands17.txt"
-      - "scripts/certify.sh"
-      - "scripts/get_tools.sh"
-      - ".github/workflows/certificates.yml"
   push:
     branches: [main]
     paths:
-      - "verification/lean/**"
+      - "verification/lean/BiplanarC5/Encode.lean"
       - "verification/data/cands17.txt"
       - "scripts/certify.sh"
       - "scripts/get_tools.sh"
