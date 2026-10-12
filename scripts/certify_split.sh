@@ -11,7 +11,9 @@
 #   3. has Lean check the trimmed proof with the verified LRAT checker of its standard library,
 #      proving (Biplanar.withCube (Biplanar.encode W) c).Unsat, and deletes the proof.
 #   A leaf that CaDiCaL does not refute within LEAF_TIMEOUT is appended to build/log/W_open.txt
-#   (its index and literals) and skipped. Lean runs one proof at a time (flock).
+#   (its index and literals) and skipped; if MARCH names march_cu, the leaf is split SPLIT_DEPTH
+#   (default 6) levels further and its children go to build/log/W_next.txt. Lean runs one proof at a
+#   time (flock).
 #   With PART = tree it instead proves in Lean that the leaves form a complete decision tree and
 #   that Phi(W) is unsatisfiable whenever every leaf formula is (Biplanar.unsat_of_leaves).
 # Needs CADICAL and LRAT_TRIM (see scripts/get_tools.sh) and elan.
@@ -93,9 +95,22 @@ for ((i = 1; i <= NL; i++)); do
   rc=$?
   set -e
   if [ "$rc" = 124 ]; then
-    rm -f "$P.raw" "$F"
+    rm -f "$P.raw"
     echo "$i $c" >> "$B/log/${TAG}_open.txt"
     echo "certify_split.sh: $W leaf $i of $NL open after $LEAF_TIMEOUT s"
+    if [ -n "${MARCH:-}" ]; then
+      set +e
+      "$MARCH" "$F" -d "${SPLIT_DEPTH:-6}" -o "$F.icnf" > /dev/null 2>&1
+      set -e
+      if grep -q '^a' "$F.icnf" 2>/dev/null; then
+        python3 "$ROOT/scripts/tree.py" leaves "$F.icnf" "$F.sub" > /dev/null
+        sed "s/^/$c /" "$F.sub" | flock "$B/log/next.lock" tee -a "$B/log/${TAG}_next.txt" > /dev/null
+      else
+        echo "$c 0" | flock "$B/log/next.lock" tee -a "$B/log/${TAG}_next.txt" > /dev/null
+      fi
+      rm -f "$F.icnf" "$F.sub"
+    fi
+    rm -f "$F"
     continue
   fi
   [ "$rc" = 20 ] || { echo "CaDiCaL exit code $rc on leaf $i of $W"; exit 1; }

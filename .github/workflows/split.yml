@@ -3,7 +3,8 @@ name: split
 # Refutes the formula Phi(w) leaf by leaf along a decision tree (scripts/certify_split.sh). Each job
 # runs three workers; worker j of job p takes the leaves i with i - 1 = 3p + j modulo 3 * jobs, and
 # Lean checks every proof. A leaf that is not refuted within the time limit is listed in
-# build/log/W_open.txt, to be split further in a later run. A push that changes
+# build/log/W_open.txt and split six levels further by march_cu (its children go to
+# build/log/W_next.txt, the leaves of the next run). A push that changes
 # verification/data/cubes/run.env starts a run with the parameters written there.
 
 on:
@@ -40,6 +41,7 @@ jobs:
       leaves: ${{ steps.p.outputs.leaves }}
       jobs: ${{ steps.p.outputs.jobs }}
       timeout: ${{ steps.p.outputs.timeout }}
+      depth: ${{ steps.p.outputs.depth }}
     steps:
       - uses: actions/checkout@v4
       - id: p
@@ -50,6 +52,7 @@ jobs:
             . verification/data/cubes/run.env
           fi
           { echo "w=$W"; echo "leaves=$LEAVES"; echo "jobs=$JOBS"; echo "timeout=$TIMEOUT"
+            echo "depth=${SPLIT_DEPTH:-6}"
             echo "parts=$(seq -s, 0 $(( JOBS - 1 )) | sed 's/^/[/; s/$/]/')"; } >> "$GITHUB_OUTPUT"
   split:
     needs: plan
@@ -81,12 +84,17 @@ jobs:
           lake build > /dev/null
           lake build biplanar-dump > /dev/null
           lake exe biplanar-dump "$W" "../../build/cnf/${W//,/_}.cnf"
+      - name: Build march_cu (cubing only; the completeness of the tree is checked in Lean)
+        run: |
+          git clone -q https://github.com/marijnheule/CnC.git build/CnC
+          git -C build/CnC checkout -q 705b60c6491ef2b61988b3ce6ac674be1b90571d
+          make -C build/CnC/march_cu > /dev/null
       - name: Refute the leaves and check the proofs in Lean
         run: |
           N=$(( ${{ needs.plan.outputs.jobs }} * 3 ))
           pids=()
           for j in 0 1 2; do
-            NOBUILD=1 LEAF_TIMEOUT=${{ needs.plan.outputs.timeout }} LEAVES="$PWD/${{ needs.plan.outputs.leaves }}" \
+            MARCH="$PWD/build/CnC/march_cu/march_cu" SPLIT_DEPTH=${{ needs.plan.outputs.depth }} NOBUILD=1 LEAF_TIMEOUT=${{ needs.plan.outputs.timeout }} LEAVES="$PWD/${{ needs.plan.outputs.leaves }}" \
               timeout 325m scripts/certify_split.sh "$W" $(( ${{ matrix.part }} * 3 + j )) "$N" \
               > "build/log/worker$j.txt" 2>&1 &
             pids+=($!)
@@ -103,4 +111,5 @@ jobs:
           path: |
             build/log/worker*.txt
             build/log/*_open.txt
+            build/log/*_next.txt
             build/log/leaves.sha256
