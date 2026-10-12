@@ -88,7 +88,8 @@ jobs:
         run: |
           git clone -q https://github.com/marijnheule/CnC.git build/CnC
           git -C build/CnC checkout -q 705b60c6491ef2b61988b3ce6ac674be1b90571d
-          make -C build/CnC/march_cu > /dev/null
+          # march_cu defines its globals in headers, which GCC 10 and later reject without -fcommon
+          make -C build/CnC/march_cu CFLAGS="-O3 -fno-strict-aliasing -Wall -DNDEBUG -fcommon" > /dev/null
       - name: Refute the leaves and check the proofs in Lean
         run: |
           N=$(( ${{ needs.plan.outputs.jobs }} * 3 ))
