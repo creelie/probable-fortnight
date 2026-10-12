@@ -172,7 +172,7 @@ Fix $w$ with $n=n(w)$, number the vertices $0,\dots,n-1$ bag by bag, and let $E$
 \item for every $e=uv\in E$, every $j$ and every $x\notin\{u,v\}$: $\ell^j_e\Rightarrow\bigvee_{i}\bigl(o^{j,i}_{ux}\wedge o^{j,i}_{vx}\bigr)$;
 \item for any two vertices $a<b$ that are consecutive in the numbering of the same bag, $a<_{1,1}b$;
 \item the clauses of Lemma~\ref{lem:contract} described below, for every pair of consecutive bags $Q=A_i\cup A_{i+1}$ with $|Q|=8$;
-\item for every $j$ and every subgraph $S$ of $\cw$ isomorphic to $K_5$ or $K_{3,3}$, the clause $\bigvee_{e\in E(S)}\neg\ell^j_e$; and for every $j$ and every clique $S$ of $\cw$ with $s\in\{6,7,8\}$ vertices, the constraint that at most $3s-6$ of the variables $\ell^j_e$ with $e\subseteq S$ are true, written with the sequential counter of~\cite{Si}.
+\item for every $j$ and every subgraph $S$ of $\cw$ isomorphic to $K_5$ or $K_{3,3}$, with edges $e_1,\dots,e_k$, the clause $\neg\ell^j_{e_1}\vee\dots\vee\neg\ell^j_{e_k}$; and for every $j$ and every clique $S$ of $\cw$ with $s\in\{6,7,8\}$ vertices, the constraint that at most $3s-6$ of the variables $\ell^j_e$ with $e\subseteq S$ are true, written as a sequential counter~\cite{Si}.
 \end{enumerate}
 
 For (E5) fix such a $Q$ and $W=V\setminus Q$. Connectivity inside a set $S$ is expressed by the variables
