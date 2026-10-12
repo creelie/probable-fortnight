@@ -211,6 +211,8 @@ For each of the $26$ vectors $w$ of Table~\ref{tab:certs}, $\Phi(w)$ is unsatisf
 
 The formulas are produced by a Lean~4 function from $w$, and the clause counts in Table~\ref{tab:certs} are those of its output. CaDiCaL~3.0.1~\cite{CaD} refutes each formula on one core and writes a proof in the LRAT format~\cite{LRAT}, a clausal proof in which every derived clause carries the hints that justify it. The proofs were shortened with lrat-trim, which keeps only the clauses used in the final refutation, and each trimmed proof was then checked against the formula by the LRAT checker of the Lean~4 standard library~\cite{Le}, which is proved sound in Lean. The result of each check is a Lean theorem stating that the formula is unsatisfiable.
 
+For the vectors marked with an asterisk in Table~\ref{tab:certs} a single run of CaDiCaL did not finish, and the formula was refuted along a decision tree. Call a list $S$ of cubes (conjunctions of literals) \emph{complete} if $S=\{\top\}$, or if every cube of $S$ begins with $x$ or with $\neg x$ for one variable $x$ and the cubes beginning with $x$, and those beginning with $\neg x$, each with that literal removed, form complete lists. Every assignment satisfies some cube of a complete list, so $\Phi(w)$ is unsatisfiable as soon as $\Phi(w)\wedge c$ is unsatisfiable for every $c\in S$. The cubes were produced by the lookahead solver march\_cu of~\cite{HKWB}, and a cube whose formula was not refuted within the time limit was split further in the same way. Each formula $\Phi(w)\wedge c$ was refuted by CaDiCaL with a trimmed LRAT proof checked in Lean as above, Lean checks that the list of cubes is complete, and the step from the leaves to $\Phi(w)$ is a theorem proved in Lean. The cubing program is therefore not trusted.\footnote{%SPLITNOTE%}
+
 \begin{table}[ht]
 \centering\small
 %TABLE_CERTS%
@@ -261,6 +263,9 @@ E.~Gethner, \emph{To the Moon and beyond}, in: Graph Theory: Favorite Conjecture
 
 \bibitem{GS}
 E.~Gethner and T.~Sulanke, \emph{Thickness-two graphs part two: more new nine-critical graphs, independence ratio, cloned planar graphs, and singly and doubly outerplanar graphs}, Graphs Combin. \textbf{25} (2009), 197--217. \doi{10.1007/s00373-008-0833-5}
+
+\bibitem{HKWB}
+M.~J.~H. Heule, O.~Kullmann, S.~Wieringa and A.~Biere, \emph{Cube and conquer: guiding CDCL SAT solvers by lookaheads}, Hardware and Software: Verification and Testing (HVC 2011), Lecture Notes in Comput. Sci. \textbf{7261}, Springer, 2012, 50--65. \doi{10.1007/978-3-642-34188-5_8}
 
 \bibitem{Hu}
 J.~P. Hutchinson, \emph{Coloring ordinary maps, maps of empires, and maps of the Moon}, Math. Mag. \textbf{66} (1993), 211--226. \doi{10.1080/0025570X.1993.11996124}
