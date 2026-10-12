@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "The biplanar clique blow-ups of the five-cycle"
+type: software
+authors:
+  - family-names: Bhattacharjee
+    given-names: Deep
+    orcid: "https://orcid.org/0000-0003-0466-750X"
+    affiliation: "Formerly, Electro-Gravitational Space Propulsion Laboratory (EGSPL), Bhubaneswar, Odisha 751030, India"
+    email: d.bhattacharjee@erl-forschung.de
+version: 1.0.0
+date-released: 2026-10-11
+license: MIT
+repository-code: "https://github.com/creelie/probable-fortnight"
+keywords:
+  - Earth-Moon problem
+  - thickness
+  - biplanar graph
+  - clique blow-up
+  - chromatic number
+  - Schnyder's theorem
+  - LRAT
+  - Lean 4
+abstract: >-
+  We prove that a clique blow-up of the five-cycle is biplanar if and only if it has at most
+  sixteen vertices and clique number at most eight. Consequently every biplanar clique blow-up
+  of the five-cycle is 8-colourable, which answers Question 7.3 of Trivedi in the negative. The
+  non-biplanar cases are refuted by a propositional encoding of biplanarity, strengthened by a
+  contraction argument for K9, whose unsatisfiability certificates are checked in Lean 4.
+references:
+  - type: article
+    title: "Biplanar clique blow-ups of C5 are 9-colourable"
+    authors:
+      - family-names: Trivedi
+        given-names: Arjun
+    year: 2026
+    doi: 10.5281/zenodo.22074335

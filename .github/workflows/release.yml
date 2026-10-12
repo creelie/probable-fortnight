@@ -1,0 +1,99 @@
+name: release
+
+# Run by hand from the Actions tab (or the API) after the PR is merged. It refutes the 26 formulas
+# again with the pinned CaDiCaL, checks every trimmed proof in Lean, and publishes a GitHub release
+# with the paper files in dist/, the 26 compressed proofs, their SHA-256 sums and the notes in
+# .github/RELEASE_NOTES.md. Zenodo archives the release and mints a DOI if the repository is
+# switched on at https://zenodo.org/account/settings/github/.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag, e.g. v1.0.0"
+        required: true
+        default: "v1.0.0"
+      target:
+        description: "Branch or commit to tag"
+        required: true
+        default: "main"
+      title:
+        description: "Release title"
+        required: true
+        default: "The biplanar clique blow-ups of the five-cycle"
+
+permissions:
+  contents: write
+
+jobs:
+  certificates:
+    name: Certificate ${{ matrix.w }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: true
+      matrix:
+        w: ["1,1,7,1,7", "1,2,6,1,7", "1,2,6,2,6", "1,3,5,1,7", "1,3,5,2,6", "1,3,5,3,5",
+            "1,4,4,1,7", "1,4,4,2,6", "1,4,4,3,5", "1,4,4,4,4", "1,5,3,2,6", "1,5,3,3,5",
+            "1,6,2,2,6", "2,2,5,2,6", "2,2,5,3,5", "2,3,4,2,6", "2,3,4,3,5", "2,3,4,4,4",
+            "2,3,5,2,5", "2,3,5,3,4", "2,4,3,3,5", "2,4,3,4,4", "2,4,4,2,5", "3,3,3,3,5",
+            "3,3,3,4,4", "3,3,4,3,4"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target }}
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - run: scripts/get_tools.sh
+      - run: scripts/certify.sh "${{ matrix.w }}"
+      - name: Compress the checked proof
+        run: |
+          W="${{ matrix.w }}"; TAG="${W//,/_}"
+          mkdir -p out
+          xz -T0 -9 -c "build/lrat/$TAG.lrat" > "out/$TAG.lrat.xz"
+          cp build/log/certificates.sha256 "out/$TAG.sha256"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cert-${{ strategy.job-index }}
+          path: out/
+          retention-days: 3
+
+  release:
+    needs: certificates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target }}
+      - name: Check the paper files
+        run: |
+          for f in dist/biplanar-c5-blowups.pdf \
+                   dist/biplanar-c5-blowups-tex.zip \
+                   dist/biplanar-c5-blowups-arxiv.tar.gz; do
+            test -s "$f" || { echo "missing $f"; exit 1; }
+          done
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: cert-*
+          path: certs
+          merge-multiple: true
+      - name: Collect the proofs
+        run: |
+          test "$(ls certs/*.lrat.xz | wc -l)" = 26
+          cat certs/*.sha256 | sort -k2 > certs/SHA256SUMS-lrat.txt
+          (cd certs && sha256sum *.lrat.xz > SHA256SUMS-xz.txt)
+          cat certs/SHA256SUMS-lrat.txt
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+          TARGET: ${{ inputs.target }}
+          TITLE: ${{ inputs.title }}
+        run: |
+          gh release create "$TAG" dist/biplanar-c5-blowups* certs/*.lrat.xz certs/SHA256SUMS-*.txt \
+            --target "$TARGET" \
+            --title "$TAG: $TITLE" \
+            --notes-file .github/RELEASE_NOTES.md

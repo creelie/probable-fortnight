@@ -1,0 +1,8 @@
+build/
+dist/certificates/
+verification/lean/.lake/
+verification/lean/Certs/
+*.aux
+*.log
+*.out
+__pycache__/

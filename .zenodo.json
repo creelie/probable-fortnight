@@ -1,0 +1,42 @@
+{
+  "title": "The biplanar clique blow-ups of the five-cycle",
+  "version": "1.0.0",
+  "upload_type": "publication",
+  "publication_type": "preprint",
+  "creators": [
+    {
+      "name": "Bhattacharjee, Deep",
+      "orcid": "0000-0003-0466-750X",
+      "affiliation": "Formerly, Electro-Gravitational Space Propulsion Laboratory (EGSPL), Bhubaneswar, Odisha 751030, India"
+    }
+  ],
+  "description": "<p>We prove that a clique blow-up C5[w] of the five-cycle is biplanar if and only if it has at most sixteen vertices and clique number at most eight. Consequently every biplanar clique blow-up of the five-cycle is 8-colourable, which answers Question 7.3 of A. Trivedi (doi:10.5281/zenodo.22074335) in the negative: no biplanar clique blow-up of the five-cycle is 9-chromatic. The 36 maximal biplanar cases have explicit pairs of plane straight-line drawings. The 26 minimal non-biplanar cases are refuted by a propositional encoding of biplanarity based on Schnyder's theorem, strengthened by a contraction argument for K9.</p><p>The archive contains the paper (PDF, LaTeX source with the figures as PNG, arXiv tarball), the dated priority check, the weight vectors, drawings and colourings, a Lean 4 development (the encoder, the finite reduction, the drawings and colourings by kernel evaluation, and a script that checks each LRAT certificate with the verified checker of the Lean standard library), and independent checks in C, C++, Bash, Python and Julia. The 26 trimmed LRAT certificates are attached to the GitHub release.</p>",
+  "keywords": [
+    "Earth-Moon problem",
+    "thickness",
+    "biplanar graph",
+    "clique blow-up",
+    "chromatic number",
+    "Schnyder's theorem",
+    "LRAT",
+    "Lean 4",
+    "05C10",
+    "05C15"
+  ],
+  "license": "MIT",
+  "language": "eng",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/creelie/probable-fortnight",
+      "relation": "isSupplementedBy",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "10.5281/zenodo.22074335",
+      "relation": "references",
+      "resource_type": "publication-preprint",
+      "scheme": "doi"
+    }
+  ],
+  "notes": "Corresponding author: d.bhattacharjee@erl-forschung.de; also itsdeep@live.com."
+}
