@@ -36,3 +36,8 @@ open Lean Elab Command in
 #print axioms Biplanar.biplanar_3_3_3_3_4
 #print axioms Biplanar.biplanar_1_1_6_1_7
 #print axioms Biplanar.colouring_3_3_3_3_4
+-- Section 7: formula (7.1) for every odd cycle, and the consequences for biplanar blow-ups
+#print axioms Biplanar.OddCycle.colourable_iff
+#print axioms Biplanar.OddCycle.chromatic
+#print axioms Biplanar.OddCycle.nine_of_long
+#print axioms Biplanar.OddCycle.nine_of_seven
