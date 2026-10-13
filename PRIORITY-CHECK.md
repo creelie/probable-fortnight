@@ -31,3 +31,19 @@ As of 11 October 2026 nobody has answered Trivedi's Question 7.3 or determined w
 of the five-cycle are biplanar. The 17-vertex non-biplanarity results here are new; the 16-vertex
 drawings are new as well, but the biplanarity of individual 16-vertex blow-ups is not claimed as the
 main result.
+
+# Priority check for Question 7.1, 13 October 2026
+
+Question 7.1 of the same preprint asks whether `chi(C_{2k+1}[w]) = max(max(w_i + w_{i+1}), ceil(n/k))`
+holds for clique blow-ups of the odd cycles `C_{2k+1}` with `k >= 3`, and notes that it would make every
+biplanar one 9-colourable. Section 7 of the paper proves the formula for every `k >= 1`.
+
+| Source | Search | What it shows |
+| --- | --- | --- |
+| OpenRefute | issues for "biplanar" | none |
+| Zenodo | "biplanar", "clique blow-up", "odd cycle blow-up chromatic", newest first | no record after Szeider's (22913639, 23 September 2026) on the question; Trivedi's record still has one version |
+| arXiv | Szeider, arXiv:2609.28102, Section 7 | uses the `112 > 104` edge count of Question 7.1 to show that `C_7[K_4]` is not biplanar, and does not address the formula |
+| Web | "weighted colouring odd cycle chromatic number", McDiarmid–Reed, Gerke–McDiarmid, Narayanan–Shende | Narayanan and Shende, *Static frequency assignment in cellular networks*, Algorithmica 29 (2001), give an algorithm that multicolours weighted cycles optimally; we did not find the closed formula stated, and the paper cites them for this |
+
+As of 13 October 2026 nobody has answered Question 7.1. The formula may be implicit in the channel
+assignment literature, which the paper says.

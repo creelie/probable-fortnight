@@ -19,6 +19,16 @@ Question 7.3 of A. Trivedi, *Biplanar clique blow-ups of C5 are 9-colourable*
 > [`verification/data/cubes/`](verification/data/cubes/)). Until all eight are certified, the theorem
 > and the answer to Question 7.3 are not proved, and no release is made.
 
+**Longer odd cycles (Section 7, complete).** For every `k >= 1` and every `w` with nonnegative
+entries, `chi(C_{2k+1}[w]) = max(max(w_i + w_{i+1}), ceil(n/k))`, which Trivedi proposed in Question 7.1.
+So every biplanar clique blow-up of an odd cycle of length at least five is 9-colourable, as asked
+there. This part does not use the certificates. The formula and the arithmetic of the corollary are
+proved in Lean (`Biplanar.OddCycle.chromatic`, `nine_of_long`, `nine_of_seven`, in
+[`verification/lean/BiplanarC5/OddCycle.lean`](verification/lean/BiplanarC5/OddCycle.lean)), with the
+non-biplanarity of `K_9` and the bound `2s-4` for triangle-free planar graphs as hypotheses.
+Weighted cycles are coloured optimally by an algorithm of Narayanan and Shende (Algorithmica 29,
+2001); we have not found the formula stated in that literature.
+
 The paper is in [`preprint/`](preprint/main.tex); the built PDF, the LaTeX source with PNG figures
 and the arXiv tarball are attached to each release. [PRIORITY-CHECK.md](PRIORITY-CHECK.md) records the
 check, dated 11 October 2026, that the question was still open.
@@ -49,6 +59,7 @@ check, dated 11 October 2026, that the question was still open.
 | Proposition 2.3: 36 pairs of plane drawings | `biplanar_*` (kernel, exact integers) | C, Python (exact tests and networkx), Julia |
 | 8-colourings of the 36 graphs | `colouring_*` (kernel) | C, Python, Julia |
 | Formula (1.1) on all 62 graphs | | Python (exhaustive colouring) |
+| Theorem 7.1 and Corollary 7.2 (odd cycles) | `Biplanar.OddCycle.chromatic`, `nine_of_long`, `nine_of_seven` (proofs for all `k`) | Python (exact dynamic programme, `k <= 5`) |
 | Theorem 5.1: `Φ(w)` unsatisfiable, 26 vectors | `Biplanar.unsat_*` via `scripts/certify.sh` (verified LRAT checker of the standard library) | lrat-trim |
 
 `verification/lean/Check.lean` audits the axioms of every theorem of the library: all of them use

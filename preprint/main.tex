@@ -42,7 +42,7 @@
 \keywords{Earth--Moon problem, thickness, biplanar graph, clique blow-up, Schnyder's theorem, LRAT}
 
 \begin{abstract}
-We prove that a clique blow-up of the five-cycle is biplanar if and only if it has at most sixteen vertices and clique number at most eight. Consequently every biplanar clique blow-up of the five-cycle is $8$-colourable, which answers a question of Trivedi. The non-biplanar cases are refuted by a propositional encoding of biplanarity, strengthened by a contraction argument for $K_9$, whose unsatisfiability certificates are checked in Lean~4. \emph{Status, 12 October 2026: the certificates for eight of the twenty-six non-biplanar cases are not yet complete, so the proof is not yet complete; see Remark~\ref{rem:status}.}
+We prove that a clique blow-up of the five-cycle is biplanar if and only if it has at most sixteen vertices and clique number at most eight. Consequently every biplanar clique blow-up of the five-cycle is $8$-colourable, which answers a question of Trivedi. The non-biplanar cases are refuted by a propositional encoding of biplanarity, strengthened by a contraction argument for $K_9$, whose unsatisfiability certificates are checked in Lean~4. We also prove the formula for the chromatic number of clique blow-ups of longer odd cycles proposed by Trivedi, so that every biplanar clique blow-up of an odd cycle of length at least five is $9$-colourable, as Trivedi asked. \emph{Status, 13 October 2026: the certificates for eight of the twenty-six non-biplanar cases are not yet complete, so the proof of Theorem~\ref{thm:main} is not yet complete; see Remark~\ref{rem:status}. Section~\ref{sec:odd} does not use them and is complete.}
 \end{abstract}
 
 \maketitle
@@ -59,7 +59,7 @@ Thus $n(w)$ is the number of vertices of $\cw$ and $s(w)$ its clique number. Eve
 \begin{equation}\label{eq:chi}
 \chi(\cw)=\max\bigl\{s(w),\,\lceil n(w)/2\rceil\bigr\},
 \end{equation}
-deduced that every biplanar $\cw$ is $9$-colourable, and asked whether the value $9$ is attained~\cite[Question~7.3]{Tr}. By~\eqref{eq:chi} this happens only for $n(w)\in\{17,18\}$, and he reduced the question to $35$ weight vectors. Kirchweger, Scheucher and Szeider had earlier shown with a long SAT computation that $C_5[4,4,4,4,3]$ is not biplanar~\cite{KSS}, and Szeider has since proved that every biplanar graph of independence number at most two has at most eighteen vertices and is $9$-colourable~\cite{Sz}. Since $9$-chromatic biplanar graphs of independence number two exist on seventeen vertices~\cite{GS}, neither result decides Trivedi's question.
+deduced that every biplanar $\cw$ is $9$-colourable, and asked whether the value $9$ is attained~\cite[Question~7.3]{Tr}. By~\eqref{eq:chi} this happens only for $n(w)\in\{17,18\}$, and Trivedi reduced the question to $35$ weight vectors. Kirchweger, Scheucher and Szeider had earlier shown with a long SAT computation that $C_5[4,4,4,4,3]$ is not biplanar~\cite{KSS}, and Szeider has since proved that every biplanar graph of independence number at most two has at most eighteen vertices and is $9$-colourable~\cite{Sz}. Since $9$-chromatic biplanar graphs of independence number two exist on seventeen vertices~\cite{GS}, neither result decides Trivedi's question.
 
 \begin{theorem}\label{thm:main}
 Let $w\in\Z_{\ge1}^5$. The graph $\cw$ is biplanar if and only if $s(w)\le8$ and $n(w)\le16$.
@@ -72,6 +72,8 @@ Every biplanar clique blow-up of the five-cycle is $8$-colourable, and the bound
 \begin{proof}
 If $\cw$ is biplanar then $s(w)\le8$ and $n(w)\le16$ by Theorem~\ref{thm:main}, so $\chi(\cw)\le8$ by~\eqref{eq:chi}. The graph $C_5[3,3,3,3,4]$ satisfies both conditions and has sixteen vertices, so it is biplanar and $\chi\ge\lceil 16/2\rceil=8$.
 \end{proof}
+
+Trivedi also asked whether~\eqref{eq:chi} extends to longer odd cycles~\cite[Question~7.1]{Tr}. It does: Theorem~\ref{thm:odd} gives $\chi(C_{2k+1}[w])=\max\{s(w),\lceil n(w)/k\rceil\}$ for every $k\ge1$, and with it every biplanar clique blow-up of an odd cycle of length at least five is $9$-colourable (Corollary~\ref{cor:odd}). This part does not depend on the certificates.
 
 The condition $s(w)\le8$ is necessary because two consecutive bags span a clique of order $w_i+w_{i+1}$, and $K_9$ is not biplanar~\cite{BHK,Tu}. Section~\ref{sec:reduction} reduces the rest of Theorem~\ref{thm:main} to $36$ graphs on sixteen vertices, which we draw, and $26$ graphs on seventeen vertices, which we refute. A biplanar graph on seventeen vertices has at most $90$ edges while ours have between $71$ and $80$, so counting gives nothing, and a direct search over pairs of planar graphs is hopeless. The refutation rests on Lemma~\ref{lem:contract}: if a component of one layer outside an $8$-clique $Q$ sees enough of $Q$, contracting it produces a ninth vertex adjacent to all of $Q$, and the two layers then contain $K_9$. Section~\ref{sec:encoding} builds this into a propositional formula, and Section~\ref{sec:certificates} describes the unsatisfiability certificates and how they are checked.\footnote{The drawings, the colourings, the reduction to finitely many weight vectors and all $26$ unsatisfiability certificates are checked in Lean~4; Section~\ref{sec:certificates} lists what is checked and what is assumed.}
 
@@ -99,7 +101,7 @@ Listing the vectors directly gives the following.
 Up to the dihedral action there are exactly $26$ vectors $w\in\Z_{\ge1}^5$ with $n(w)=17$ and $s(w)\le8$, and exactly $36$ with $n(w)=16$ and $s(w)\le8$. They are listed in Tables~\ref{tab:certs} and~\ref{tab:sixteen}.
 \end{lemma}
 
-Since $s(w)\le8$ and all coordinates are positive, every coordinate is at most $7$, so the lists come from a finite enumeration. The $26$ vectors of the first list all satisfy Trivedi's further conditions $\sum_i w_iw_{i+1}\le4n-8$ and $e\le6n-12$, and they are exactly his seventeen-vertex candidates; his nine eighteen-vertex candidates each contain one of them.
+Since $s(w)\le8$ and all coordinates are positive, every coordinate is at most $7$, so the lists come from a finite enumeration. The $26$ vectors of the first list all satisfy Trivedi's further conditions $\sum_i w_iw_{i+1}\le4n-8$ and $e\le6n-12$, and they are exactly Trivedi's seventeen-vertex candidates; each of the nine eighteen-vertex candidates of~\cite{Tr} contains one of them.
 
 \begin{table}[ht]
 \centering\small
@@ -233,6 +235,43 @@ Let $w\in\Z_{\ge1}^5$. If $s(w)\ge9$ then $\cw$ contains $K_9$ and is not biplan
 The graph $C_5[4,4,4,4,3]$ of~\cite{KSS} contains $C_5[3,3,3,4,4]$, one of the graphs of Table~\ref{tab:certs}. The clauses (E5) are what make the computation feasible: without them CaDiCaL did not refute the formula for $w=(1,1,7,1,7)$, the easiest of the $26$, within thirty minutes, while with them it is refuted in under a minute and the slowest of the $26$ takes %SLOWEST%. The contraction clauses are useful whenever a graph has many $8$-cliques whose complements are small.
 \end{remark}
 
+\section{Longer odd cycles}\label{sec:odd}
+
+For $k\ge1$ and $w=(w_0,\dots,w_{2k})\in\Z_{\ge0}^{2k+1}$ let $C_{2k+1}[w]$ have bags $A_0,\dots,A_{2k}$ with $|A_i|=w_i$, two distinct vertices being adjacent when their bags are equal or consecutive on the cycle; indices are read modulo $2k+1$, and $n(w)$ and $s(w)=\max_i(w_i+w_{i+1})$ are defined as before. Trivedi showed that the analogue of~\eqref{eq:chi} would make every biplanar $C_{2k+1}[w]$ with $k\ge3$ $9$-colourable, and asked whether it holds~\cite[Question~7.1]{Tr}.
+
+\begin{theorem}\label{thm:odd}
+For every $k\ge1$ and $w\in\Z_{\ge0}^{2k+1}$,
+\begin{equation}\label{eq:odd}
+\chi(C_{2k+1}[w])=\max\bigl\{s(w),\,\lceil n(w)/k\rceil\bigr\}.
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Two consecutive bags span a clique. An independent set of $C_{2k+1}$ has at most $k$ vertices, so an independent set of $C_{2k+1}[w]$ meets at most $k$ bags and takes at most one vertex from each; every colour class therefore has at most $k$ vertices. This gives the lower bound.
+
+For the upper bound let $m$ be the right-hand side of~\eqref{eq:odd}, so that $w_i+w_{i+1}\le m$ for every $i$ and $n(w)\le km$, and put $g=km-n(w)$. For $0\le i\le 2k$ let
+\[
+S_i=\sum_{t<i}w_t,\qquad R_i=\sum_{t<i}\,(m-w_t-w_{t+1}),\qquad a_i=S_i+\min\{g,R_i\},
+\]
+and give the vertices of $A_i$ the residues modulo $m$ of the $w_i$ consecutive integers $a_i,\dots,a_i+w_i-1$. Since $w_i\le m$, the colours inside a bag are distinct. For $i<2k$,
+\[
+0\le a_{i+1}-(a_i+w_i)=\min\{g,R_{i+1}\}-\min\{g,R_i\}\le R_{i+1}-R_i=m-w_i-w_{i+1},
+\]
+so the integers used on $A_i$ and on $A_{i+1}$ are different and together lie in an interval of length $a_{i+1}+w_{i+1}-a_i\le m$; their residues are therefore different. It remains to compare $A_{2k}$ with $A_0$. Summing the increments gives $R_{2k}=2km-2n(w)+w_0+w_{2k}$, which is at least $g$ because $n(w)\le km$. Hence $a_{2k}=S_{2k}+g=km-w_{2k}$, and $A_{2k}$ receives the residues $m-w_{2k},\dots,m-1$, while $a_0=0$ and $A_0$ receives $0,\dots,w_0-1$. These are disjoint because $w_0+w_{2k}\le m$.
+\end{proof}
+
+The colouring winds $k$ times round $\Z/m\Z$ and spends the $g$ spare colours on the first gaps. For $k=2$, \eqref{eq:odd} is~\eqref{eq:chi}. Clique blow-ups of cycles are the weighted cycles of the channel assignment problem, which Narayanan and Shende colour optimally by an algorithm~\cite{NS}; we have not found~\eqref{eq:odd} stated in that literature.\footnote{Theorem~\ref{thm:odd} for every $k$, and the arithmetic of Corollary~\ref{cor:odd} with the two planarity facts used there as hypotheses, are checked in Lean~4~\cite{Ar}. A computer check by an exact dynamic programme, which does not use the theorem, confirms~\eqref{eq:odd} for $k\le5$ and small entries.}
+
+\begin{corollary}\label{cor:odd}
+For every $k\ge2$, every biplanar clique blow-up of $C_{2k+1}$ is $9$-colourable. In particular Question~7.1 of~\cite{Tr} has a positive answer.
+\end{corollary}
+
+\begin{proof}
+The deduction is Trivedi's~\cite[Question~7.1]{Tr}. Let $C_{2k+1}[w]$ be biplanar. Since $K_9$ is not biplanar~\cite{BHK,Tu}, $s(w)\le8$, and summing $w_i+w_{i+1}\le8$ over $i$ gives $n(w)\le4(2k+1)$. For $k=2$ the claim is Trivedi's theorem~\cite{Tr} when all entries are positive; if some $w_j=0$, then $n(w)$ is the sum of two disjoint pairs of consecutive entries, so $\lceil n(w)/2\rceil\le s(w)\le8$. For $k\ge4$, $\lceil n(w)/k\rceil\le8+\lceil4/k\rceil=9$ and Theorem~\ref{thm:odd} applies. Let $k=3$ and suppose that $\chi\ge10$. Then $n(w)\ge28$ by~\eqref{eq:odd}, so $n(w)=28$ and $w_i+w_{i+1}=8$ for every $i$. Thus $w_{i+2}=w_i$ for every $i$, and as $2$ generates $\Z/7\Z$ all entries are equal to $4$. The edges between different bags form a triangle-free graph, because $C_7$ has no triangle, so each of the two planar layers contains at most $2\cdot28-4=52$ of them; but there are $7\cdot16=112>104$ such edges.
+\end{proof}
+
+Szeider uses the same count to show that $C_7[K_4]$ is not biplanar~\cite[Section~7]{Sz}. Whether $9$ is attained by a biplanar clique blow-up of a longer odd cycle is open; for $k\ge4$ it needs $n(w)\ge8k+1$, close to the bound $4(2k+1)$.
+
 \subsection*{Data availability}
 The weight vectors, drawings, colourings, formulas and certificates, together with the Lean~4 development and independent checks, are archived with the source of this paper~\cite{Ar}.
 
@@ -282,6 +321,9 @@ L.~de Moura and S.~Ullrich, \emph{The Lean~4 theorem prover and programming lang
 
 \bibitem{Ku}
 K.~Kuratowski, \emph{Sur le probl\`eme des courbes gauches en topologie}, Fund. Math. \textbf{15} (1930), 271--283. \doi{10.4064/fm-15-1-271-283}
+
+\bibitem{NS}
+L.~Narayanan and S.~M. Shende, \emph{Static frequency assignment in cellular networks}, Algorithmica \textbf{29} (2001), 396--409. \doi{10.1007/s004530010067}
 
 \bibitem{Ri}
 G.~Ringel, \emph{F\"arbungsprobleme auf Fl\"achen und Graphen}, VEB Deutscher Verlag der Wissenschaften, Berlin, 1959.

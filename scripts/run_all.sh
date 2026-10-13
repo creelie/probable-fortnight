@@ -7,6 +7,8 @@
 #   Shell   verification/shell/check_lists.sh    Lemma 2.2 with awk alone
 #   Python  verification/python/verify_c5.py     Lemmas 2.1 and 2.2, the drawings (exact tests and
 #                                                networkx), the colourings, formula (1.1) on all 62 graphs
+#           verification/python/odd_cycles.py    Section 7: formula (7.1) against an exact dynamic programme,
+#                                                the colouring of Theorem 7.1, the arithmetic of Corollary 7.2
 #   Julia   verification/julia/verify_c5.jl      Lemmas 2.1 and 2.2, the drawings and colourings
 #                                                (if julia is on PATH or $JULIA is set)
 #   Lean    verification/lean/                   Lean 4 v4.34.1: the encoder, Lemma 2.2, the enumeration
@@ -45,6 +47,8 @@ bash "$V/shell/check_lists.sh" "$D" > "$BUILD/sh.txt" 2>&1 && last "$BUILD/sh.tx
 echo "== Python"
 python3 "$V/python/verify_c5.py" > "$BUILD/py.txt" 2>&1 && last "$BUILD/py.txt" '^ALL CHECKS PASSED$' \
   && ok "verify_c5.py" || fail "verify_c5.py (see build/py.txt)"
+python3 "$V/python/odd_cycles.py" > "$BUILD/py6.txt" 2>&1 && last "$BUILD/py6.txt" '^ALL CHECKS PASSED$' \
+  && ok "odd_cycles.py" || fail "odd_cycles.py (see build/py6.txt)"
 
 echo "== Julia"
 JULIA="${JULIA:-$(command -v julia || true)}"
