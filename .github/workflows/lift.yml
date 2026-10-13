@@ -1,0 +1,90 @@
+name: lift
+
+# Decides the winding-lift cases of the hard seventeen-vertex vectors (verification/python/lift_case.py).
+# Each job builds Phi(w), adds the constraints of one case (LL, LN or NN) and races Kissat and
+# CaDiCaL on it; the first answer is kept. A push that changes verification/data/lift/run.env starts
+# a run over the cases listed there.
+
+on:
+  push:
+    paths: ["verification/data/lift/run.env"]
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      cases: ${{ steps.p.outputs.cases }}
+      timeout: ${{ steps.p.outputs.timeout }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: p
+        run: |
+          . verification/data/lift/run.env
+          { echo "cases=$CASES"; echo "timeout=$TIMEOUT"; } >> "$GITHUB_OUTPUT"
+  case:
+    needs: plan
+    name: ${{ matrix.case }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    strategy:
+      fail-fast: false
+      matrix:
+        case: ${{ fromJSON(needs.plan.outputs.cases) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Build CaDiCaL 3.0.1, Kissat 4.0.4 and the encoder
+        run: |
+          scripts/get_tools.sh
+          git clone -q https://github.com/arminbiere/kissat.git build/tools/kissat
+          git -C build/tools/kissat checkout -q 8af8e56f174b778aef3aa45af9f739b2a5f492c2
+          (cd build/tools/kissat && ./configure > /dev/null && make -j"$(nproc)" > /dev/null)
+          build/tools/kissat/build/kissat --version
+          pip install python-sat > /dev/null
+          cd verification/lean
+          lake build biplanar-dump > /dev/null
+      - name: Build the case formula
+        run: |
+          C="${{ matrix.case }}"; W="${C%:*}"; M="${C#*:}"
+          mkdir -p build/cnf build/log
+          (cd verification/lean && lake exe biplanar-dump "$W" "../../build/cnf/base.cnf")
+          python3 verification/python/lift_case.py "$W" build/cnf/base.cnf build/cnf/case.cnf "$M"
+          sha256sum build/cnf/case.cnf
+      - name: Race the solvers
+        run: |
+          C="${{ matrix.case }}"; TAG="${C//,/_}"; TAG="${TAG/:/_}"
+          T=build/tools; TO=$(( ${{ needs.plan.outputs.timeout }} ))
+          s=$(date +%s)
+          timeout $TO $T/kissat/build/kissat -q build/cnf/case.cnf > build/log/k1.txt 2>&1 & p1=$!
+          timeout $TO $T/kissat/build/kissat -q --unsat build/cnf/case.cnf > build/log/k2.txt 2>&1 & p2=$!
+          timeout $TO $T/cadical/build/cadical -q build/cnf/case.cnf > build/log/c1.txt 2>&1 & p3=$!
+          timeout $TO $T/cadical/build/cadical -q --unsat build/cnf/case.cnf > build/log/c2.txt 2>&1 & p4=$!
+          res=UNKNOWN; who=none
+          while true; do
+            for x in k1 k2 c1 c2; do
+              if grep -q '^s UNSATISFIABLE' build/log/$x.txt 2>/dev/null; then res=UNSAT; who=$x; fi
+              if grep -q '^s SATISFIABLE' build/log/$x.txt 2>/dev/null; then res=SAT; who=$x; fi
+            done
+            [ "$res" != UNKNOWN ] && break
+            kill -0 $p1 2>/dev/null || kill -0 $p2 2>/dev/null || kill -0 $p3 2>/dev/null || kill -0 $p4 2>/dev/null || break
+            sleep 20
+          done
+          kill $p1 $p2 $p3 $p4 2>/dev/null || true
+          echo "$C $res by $who after $(( $(date +%s) - s )) s" | tee build/log/result_$TAG.txt
+          if [ "$res" = SAT ]; then cp build/log/$who.txt build/log/model_$TAG.txt; fi
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+      - name: Keep the result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lift-${{ env.TAG }}
+          path: |
+            build/log/result_*.txt
+            build/log/model_*.txt
